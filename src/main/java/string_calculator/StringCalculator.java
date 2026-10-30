@@ -3,25 +3,36 @@ package string_calculator;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
+
+    private static final String CUSTOM_DELIMITER_PREFIX = "//";
+    private static final String DEFAULT_DELIMITER = ",";
+
     public int add(String numbers) {
         if (numbers == null || numbers.isEmpty()) return 0;
 
-        String delimiter = ",";
+        String delimiter = DEFAULT_DELIMITER;
         String numbersToProcess = numbers;
 
-        // Detectar si hay delimitador personalizado
-        if (numbers.startsWith("//")) {
-            int delimiterEndIndex = numbers.indexOf("\n");
-            // Extraer el delimitador ignorando el "//" inicial
-            delimiter = numbers.substring(2, delimiterEndIndex);
-            // Aislar solo la parte de los números
-            numbersToProcess = numbers.substring(delimiterEndIndex + 1);
+        if (hasCustomDelimiter(numbers)) {
+            delimiter = extractDelimiter(numbers);
+            numbersToProcess = extractNumbers(numbers);
         }
 
-        // Pattern.quote asegura que si el delimitador contiene caracteres especiales regex (como | o *) se traten literalmente
-        String[] nums = numbersToProcess.split(Pattern.quote(delimiter));
+        return sumarArray(numbersToProcess.split(Pattern.quote(delimiter)));
+    }
 
-        return sumarArray(nums);
+    private boolean hasCustomDelimiter(String numbers) {
+        return numbers.startsWith(CUSTOM_DELIMITER_PREFIX);
+    }
+
+    private String extractDelimiter(String numbers) {
+        int newlineIndex = numbers.indexOf("\n");
+        return numbers.substring(2, newlineIndex);
+    }
+
+    private String extractNumbers(String numbers) {
+        int newlineIndex = numbers.indexOf("\n");
+        return numbers.substring(newlineIndex + 1);
     }
 
     private int sumarArray(String[] numeros) {
